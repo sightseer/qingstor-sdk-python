@@ -29,6 +29,16 @@ generate:
 	yapf -i -r ./qingstor ./tests ./scenarios
 	@echo "ok"
 
+generate-docs:
+	@if [[ ! -f "$$(which snips)" ]]; then \
+		echo "ERROR: Command \"snips\" not found."; \
+	fi
+	snips \
+		--service=qingstor --service-api-version=latest \
+		--spec="./specs" --template="./docs/template" --output="./docs/source/api"
+	rm ./docs/source/api/object.md
+	@echo "ok"
+
 update:
 	git submodule update --remote
 	@echo "ok"
