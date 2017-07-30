@@ -10,22 +10,22 @@ class FileChunk:
         file_path(str):the relative path of the file
         part_size(int): the part size users want to partition of the file in byte
         source_file:source_file refers to the uploading file object
-        part_num_list(int): the list of part index which hasn't yet uploaded 
+        part_wait_list(int): the list of part index which is waiting to upload 
         cur_read_part(str): the string of current part reading from the source file
         part_amount(int): the total part number partitioned of the source file according to the part size
 
     '''
     def __init__(self,file_path,part_size):
         self.file_path=file_path
-        self.part_num_list=[]       
+        self.part_wait_list=[]       
         self.cur_read_part=""
         self.part_size=part_size
 
-    def part_num_list_init(self):
+    def part_wait_list_init(self):
         part_amount=self.get_file_part_amount()
         #initialize the list, part index from 0 to part_amount-1
         for i in range(0,part_amount):
-            self.part_num_list+=[i]
+            self.part_wait_list+=[i]
 
     #the method is to calculate the total part number
     def get_file_part_amount(self):
