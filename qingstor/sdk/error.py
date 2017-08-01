@@ -58,8 +58,10 @@ class MaxPartsExceededError:
     def __init__(self):
         pass
     def __str__(self):
-        return "".join(["Max_parts_exceeded:",
-            "The part's number exceeds part limitation(1000)"])
+        return "".join([
+            "Max_parts_exceeded:",
+            "The part's number exceeds part limitation(1000)"
+        ])
 
 
 class InvalidObjectNameError:
@@ -68,3 +70,13 @@ class InvalidObjectNameError:
         pass
     def __str__(self):
         return repr("Invalid Object Name!")
+
+class BadRequestError:
+
+    def __init__(self):
+        pass
+    def __str__(self):
+        return "".join([
+            "Bad Request Error.",
+            "It may be caused by network"        
+        ])
