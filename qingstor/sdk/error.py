@@ -46,18 +46,25 @@ class ParameterValueNotAllowedError(Exception):
 
 
 class PartTooSmallError:
-    def __init__():
+    
+    def __init__(self):
         pass
     def __str__(self):
-        return repr("Invalid Request!\n \
-[entity_too_small]:The part size of the uploading file is \
-smaller than the smallest limitation(4M)")
+        return repr("Entity_too_small: The part size is too small!")
 
 
 class MaxPartsExceededError:
-    def __init__():
+    
+    def __init__(self):
         pass
     def __str__(self):
-        return repr("Invalid Request!\n \
-[max_parts_exceeded]: The part size is so small that the number of \
-part exceeds part limitation(1000)\n")
+        return "".join(["Max_parts_exceeded:",
+            "The part's number exceeds part limitation(1000)"])
+
+
+class InvalidObjectNameError:
+
+    def __init__(self):
+        pass
+    def __str__(self):
+        return repr("Invalid Object Name!")
