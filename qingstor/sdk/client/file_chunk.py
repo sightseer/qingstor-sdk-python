@@ -32,10 +32,10 @@ class FileChunk:
     # The method is to calculate the total part number.
     def get_file_part_amount(self):
         self.file_descriptor.seek(0,os.SEEK_END)
-        file_size=self.file_descriptor.tell()
+        self.file_size=self.file_descriptor.tell()
         part_size=self.part_size
-        part_amount=file_size/part_size
-        last_part=file_size-part_size*part_amount 
+        part_amount=self.file_size/part_size
+        last_part=self.file_size-part_size*part_amount 
         if  last_part>0:
              part_amount+=1
         return part_amount
