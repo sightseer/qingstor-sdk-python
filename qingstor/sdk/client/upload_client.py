@@ -67,4 +67,3 @@ class UploadClient:
         else:
             raise BadRequestError()
         
-

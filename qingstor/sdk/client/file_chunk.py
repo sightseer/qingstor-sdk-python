@@ -48,6 +48,3 @@ class FileChunk:
     	cur_read_part=self.file_descriptor.read(part_size)	
         return cur_read_part
 
-
-
-
