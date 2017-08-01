@@ -17,9 +17,9 @@
 
 CHUNK_SIZE = 32 * 1024 * 1024
 
-#Http status code
-#The request is ok
+# Http Status Code
+# The request is ok
 HTTP_OK = 200
-#The uploading part is created in the Qing Console
+# The uploading part is created in the Qing Console
 HTTP_CREATED = 201    
 HTTP_BAD_REQUEST = 400
