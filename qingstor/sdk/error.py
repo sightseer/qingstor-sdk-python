@@ -71,6 +71,7 @@ class InvalidObjectNameError:
     def __str__(self):
         return repr("Invalid Object Name!")
 
+
 class BadRequestError:
 
     def __init__(self):
@@ -80,3 +81,4 @@ class BadRequestError:
             "Bad Request Error.",
             "It may be caused by network"        
         ])
+
