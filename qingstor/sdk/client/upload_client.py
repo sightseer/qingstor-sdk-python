@@ -2,9 +2,8 @@ import os
 import logging
 
 from file_chunk import FileChunk
-from qingstor.sdk.service.qingstor import QingStor
-from constant import HTTP_CREATED,HTTP_OK,HTTP_BAD_REQUEST
-from error import PartTooSmallError,MaxPartsExceededError,InvalidObjectNameError 
+from constant import HTTP_CREATED,HTTP_OK,HTTP_BAD_REQUEST,DEFAULT_PART_SIZE,SMALLEST_PART_SIZE
+from error import PartTooSmallError,MaxPartsExceededError,InvalidObjectNameError,BadRequestError 
 
 
 class UploadClient:
@@ -22,28 +21,30 @@ class UploadClient:
         
     '''
 
-    def __init__(self,bucket,part_size):
-    	if(part_size<4*1024*1024):
+    def __init__(self,bucket,part_size=DEFAULT_PART_SIZE):
+    	if(part_size<SMALLEST_PART_SIZE):
             raise PartTooSmallError()
         else:
             self.bucket=bucket
             self.part_size=part_size
             self.logger=logging.getLogger("qingstor-sdk")
         
-    def upload_large_file(self,file_name,file_descriptor):
+    def upload_file(self,file_name,file_descriptor):
+        file_chunk=FileChunk(self.part_size,file_descriptor)
+        # Check the file size and part amount
+        if(file_chunk.file_size<SMALLEST_PART_SIZE):
+            self.bucket.put_object(file_name,file_descriptor)
+            return
+        elif(file_chunk.part_amount>1000):
+            raise MaxPartsExceededError()    
         # Initiate multipart upload, create an upload id.
         output=self.bucket.initiate_multipart_upload(file_name) 
-        if output.status_code==HTTP_OK:
-            self.logger.info("Multipart Upload Initialization Done!")   
-        elif output.status_code==HTTP_BAD_REQUEST:
+        if output.status_code==HTTP_BAD_REQUEST:
             raise InvalidObjectNameError()
-        else:
+        elif output.status_code!=HTTP_OK:
             self.logger.error("Bad Request!")
             return
         this_upload_id=output['upload_id']
-        file_chunk=FileChunk(self.part_size,file_descriptor)
-        if(file_chunk.part_amount>1000):
-            raise MaxPartsExceededError()    
         part_uploaded_list=[] 
         # This for loop is to upload each part iteratively until all parts uploaded.                
         for part_index in file_chunk.part_wait_list:
@@ -56,15 +57,14 @@ class UploadClient:
             )
             if output.status_code==HTTP_CREATED:
                 part_uploaded_list+=[{"part_number":part_index}] 
-                self.logger.info("%d Part Uploaded!"%part_index)
-            elif output.status_code==HTTP_BAD_REQUEST:
-                self.logger.error("Part Uploading Error!")
+            else:
+                raise BadRequestError()
+            
         # Check if the number of uploaded part equals to the original part amount, if so, this uploading is completed.
         if len(part_uploaded_list)==file_chunk.part_amount:
             complete_output=self.bucket.complete_multipart_upload(file_name,this_upload_id,object_parts=part_uploaded_list) 
             self.logger.info("Multipart Upload Completed!")
-            return complete_output
         else:
-            self.logger.error("Multipart Upload Failed!")
+            raise BadRequestError()
         
 
