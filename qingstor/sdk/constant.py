@@ -23,3 +23,9 @@ HTTP_OK = 200
 # The uploading part is created in the Qing Console
 HTTP_CREATED = 201    
 HTTP_BAD_REQUEST = 400
+
+# Some constants in upload_client
+# Default part size of multipart upload
+DEFAULT_PART_SIZE=64*1024*1024
+# The smallest part size 
+SMALLEST_PART_SIZE=4*1024*1024
