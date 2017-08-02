@@ -1,7 +1,7 @@
 import os
 import logging
 
-from ..file_chunk import FileChunk
+from .file_chunk import FileChunk
 from ..constant import (
     HTTP_OK,
     MAX_PARTS,
@@ -10,7 +10,7 @@ from ..constant import (
     DEFAULT_PART_SIZE,
     SMALLEST_PART_SIZE
 )
-from error import (
+from ..error import (
     BadRequestError,
     PartTooSmallError,
     MaxPartsExceededError,
@@ -26,8 +26,8 @@ class UploadClient:
         part_size(int): the part size users want to partition of the file in byte
 
     Attributes:
-        file_descriptor(object): the source uploading file object
-        file_name: the key(usually using file name) of the uploading file
+        fd(object): the source uploading file object
+        object_key: the key(usually using file name) of the uploading file
         bucket: bucket refers to bucket object users creating in the QingCloud
         part_size(int): the part size users want to partition of the file in byte
 
@@ -41,16 +41,20 @@ class UploadClient:
             self.part_size = part_size
             self.logger = logging.getLogger("qingstor-sdk")
 
-    def upload_file(self, file_name, file_descriptor):
-        file_chunk = FileChunk(self.part_size, file_descriptor)
-        # Check the file size and part amount
+    def upload_file(self, object_key, fd, content_type=""):
+        file_chunk = FileChunk(self.part_size, fd)
+        # Check the file size
         if (file_chunk.file_size < SMALLEST_PART_SIZE):
-            self.bucket.put_object(file_name, file_descriptor)
+            self.bucket.put_object(object_key, body=fd)
             return
-        elif (file_chunk.part_amount > MAX_PARTS):
+        # Check the part amount
+        if (file_chunk.part_amount > MAX_PARTS):
             raise MaxPartsExceededError()
         # Initiate multipart upload, create an upload id.
-        output = self.bucket.initiate_multipart_upload(file_name)
+        if content_type == "":
+            output = self.bucket.initiate_multipart_upload(object_key)
+        else:
+            output = self.bucket.initiate_multipart_upload(object_key,content_type)
         if output.status_code == HTTP_BAD_REQUEST:
             raise InvalidObjectNameError()
         elif output.status_code != HTTP_OK:
@@ -62,7 +66,7 @@ class UploadClient:
         for part_index in file_chunk.part_wait_list:
             cur_read_part = file_chunk.read_file_part(part_index)
             output = self.bucket.upload_multipart(
-                file_name,
+                object_key,
                 upload_id=this_upload_id,
                 part_number=part_index,
                 body=cur_read_part)
@@ -71,10 +75,11 @@ class UploadClient:
             else:
                 raise BadRequestError()
 
-        # Check if the number of uploaded part equals to the original part amount, if so, this uploading is completed.
+        # Check if the number of uploaded part equals to the original part amount,
+        # if so, this uploading is completed.
         if len(part_uploaded_list) == file_chunk.part_amount:
             self.bucket.complete_multipart_upload(
-                file_name, this_upload_id, object_parts=part_uploaded_list)
+                object_key, this_upload_id, object_parts=part_uploaded_list)
             self.logger.info("Multipart Upload Completed!")
         else:
             raise BadRequestError()
