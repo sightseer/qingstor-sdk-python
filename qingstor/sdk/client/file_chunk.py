@@ -1,8 +1,5 @@
 import os
 
-from ..error import PartTooSmallError
-from ..constant import SMALLEST_PART_SIZE
-
 
 class FileChunk:
     """file processing,including open file,move file pointer and read file
@@ -19,8 +16,6 @@ class FileChunk:
     """
 
     def __init__(self, part_size, fd):
-        if part_size < SMALLEST_PART_SIZE:
-            raise PartTooSmallError()
         self.part_size = part_size
         self.fd = fd
         self.part_amount = self.get_file_part_amount()
@@ -39,6 +34,7 @@ class FileChunk:
         if last_part > 0:
             assert isinstance(part_amount, object)
             part_amount += 1
+        self.fd.seek(0,os.SEEK_SET)
         return part_amount
 
     def read_file_part(self, part_index):
