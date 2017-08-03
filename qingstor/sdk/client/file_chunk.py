@@ -32,7 +32,6 @@ class FileChunk:
         part_amount = self.file_size // part_size
         last_part = self.file_size - part_size * part_amount
         if last_part > 0:
-            assert isinstance(part_amount, object)
             part_amount += 1
         self.fd.seek(0,os.SEEK_SET)
         return part_amount
