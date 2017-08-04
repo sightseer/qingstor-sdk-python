@@ -17,7 +17,7 @@ class TestFileChunk(unittest.TestCase):
 
     def tearDown(self):
         os.system("rm -f test_small_file")
-        
+
     def test_read_file_part(self):
         with open(TEST_FILE_PATH, "rb") as f:
             f.seek(TEST_PART_SIZE*TEST_PART_INDEX, os.SEEK_SET)
