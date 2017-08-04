@@ -1,13 +1,12 @@
 import os
 import unittest
-from read_file_part import *
 from qingstor.sdk.client.file_chunk import FileChunk
 
 
 # The part size of each reading
 TEST_PART_SIZE = 50
 TEST_PART_INDEX = 10
-#expected_amount = size(test_small_file.txt)/test_part_size=896/50=18
+# Expected_amount = size(test_small_file.txt)/test_part_size=896/50=18
 EXPECTED_AMOUNT = 18
 TEST_FILE_PATH="test_small_file.txt"
 
@@ -22,7 +21,6 @@ class TestFileChunk(unittest.TestCase):
         self.assertEqual(expected_output,test_output)
 
     def test_get_part_amount(self):
-      #  test_amount=0
         with open(TEST_FILE_PATH, "rb") as f:
             temp_file_chunk = FileChunk(TEST_PART_SIZE, f)
             test_amount=temp_file_chunk.get_file_part_amount()
