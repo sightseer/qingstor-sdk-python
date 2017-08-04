@@ -37,6 +37,23 @@ class AccessConfig:
 
 class TestUploadClient(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        output200=MockHttpResponse(200)
+        cls.mock_http200=mock.Mock(return_value=output200)
+        output201=MockHttpResponse(201)
+        cls.mock_http201=mock.Mock(return_value=output201)
+        output400=MockHttpResponse(400)
+        cls.mock_http400=mock.Mock(return_value=output400)
+
+        # Set the access config
+        access_config=AccessConfig()
+        qingstor=access_config.set_qingstor()
+        # Create bucket instance
+        bucket=qingstor.Bucket('test_upload_bucket','pek3a')
+        cls.upload_obj = UploadClient(bucket, TEST_PART_SIZE)
+
+
     def setUp(self):
         os.system("dd if=/dev/zero of=test_file_100M bs=1024 count=102400")
 
@@ -45,61 +62,29 @@ class TestUploadClient(unittest.TestCase):
 
     def test_right_response(self):
         # Mock the output of initiate_multipart_upload
-        output1=MockHttpResponse(200)
-        http200=mock.Mock(return_value=output1)
-        Bucket.initiate_multipart_upload=http200
-
+        Bucket.initiate_multipart_upload=self.mock_http200
         # Mock the output of upload_multipart
-        output2=MockHttpResponse(201)
-        http201=mock.Mock(return_value=output2)
-        Bucket.upload_multipart=http201
+        Bucket.upload_multipart=self.mock_http201
 
-        # Set the access config
-        access_config=AccessConfig()
-        qingstor=access_config.set_qingstor()
-
-        # Create bucket instance
-        bucket=qingstor.Bucket('test_upload_bucket','pek3a')
-        upload_obj = UploadClient(bucket, TEST_PART_SIZE)
         with open(TEST_FILE_PATH, 'rb') as f:
-            upload_obj.upload_file('upload_20180803.mp4', f)
+            self.upload_obj.upload_file('upload_20180803.mp4', f)
 
     def test_initialize_bad_response(self):
         # Mock the output of initiate_multipart_upload
-        output1=MockHttpResponse(400)
-        http400=mock.Mock(return_value=output1)
-        Bucket.initiate_multipart_upload=http400
+        Bucket.initiate_multipart_upload=self.mock_http400
 
-        # Set the access config
-        access_config = AccessConfig()
-        qingstor = access_config.set_qingstor()
-
-        # Create bucket instance
-        bucket=qingstor.Bucket('test_upload_bucket','pek3a')
-        upload_obj = UploadClient(bucket, TEST_PART_SIZE)
         with open(TEST_FILE_PATH, 'rb') as f:
-            self.assertRaises(InvalidObjectNameError,upload_obj.upload_file,TEST_OBJECT_KEY,f)
+            self.assertRaises(InvalidObjectNameError,self.upload_obj.upload_file,TEST_OBJECT_KEY,f)
 
     def test_upload_bad_response(self):
         # Mock the output of initiate_multipart_upload
-        output1=MockHttpResponse(200)
-        http200=mock.Mock(return_value=output1)
-        Bucket.initiate_multipart_upload=http200
+        Bucket.initiate_multipart_upload=self.mock_http200
 
         # Mock the output of upload_multipart
-        output2=MockHttpResponse(400)
-        http400=mock.Mock(return_value=output2)
-        Bucket.upload_multipart=http400
+        Bucket.upload_multipart=self.mock_http400
 
-        # Set the access config
-        access_config = AccessConfig()
-        qingstor = access_config.set_qingstor()
-
-        # Create bucket instance
-        bucket=qingstor.Bucket('test_upload_bucket','pek3a')
-        upload_obj = UploadClient(bucket, TEST_PART_SIZE)
         with open(TEST_FILE_PATH, 'rb') as f:
-            self.assertRaises(BadRequestError,upload_obj.upload_file,TEST_OBJECT_KEY,f)
+            self.assertRaises(BadRequestError,self.upload_obj.upload_file,TEST_OBJECT_KEY,f)
 
 if __name__=="__main__":
     unittest.main()
