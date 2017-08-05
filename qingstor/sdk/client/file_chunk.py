@@ -43,4 +43,3 @@ class FileChunk:
         # Read the current part content returned in the cur_read_part.
         cur_read_part = self.fd.read(part_size)
         return cur_read_part
-
