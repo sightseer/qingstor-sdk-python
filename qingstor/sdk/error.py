@@ -79,3 +79,4 @@ class BadRequestError(Exception):
 
     def __str__(self):
         return "".join(["Bad Request Error.", "It may be caused by network"])
+
