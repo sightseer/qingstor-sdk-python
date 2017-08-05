@@ -8,7 +8,6 @@ TEST_PART_SIZE = 50
 TEST_PART_INDEX = 10
 # Expected_amount = size(test_small_file.txt)/test_part_size=1024*500/50=10240
 EXPECTED_AMOUNT = 10240
-#TEST_FILE_PATH="test_small_file"
 TEST_FILE_PATH="test_small_file"
 
 class TestFileChunk(unittest.TestCase):
