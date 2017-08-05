@@ -74,7 +74,7 @@ class UploadClient:
                 part_uploaded_list += [{"part_number": part_index}]
             else:
                 raise BadRequestError()
-
+            print("StatusCode=%d"%output.status_code)
         # Check if the number of uploaded part equals to the original part amount,
         # if so, this uploading is completed.
         if len(part_uploaded_list) == file_chunk.part_amount:
