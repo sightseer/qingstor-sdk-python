@@ -1,11 +1,17 @@
-from qingstor.sdk.error import BadRequestError,InvalidObjectNameError
+from qingstor.sdk.error import (
+    BadRequestError,
+    InvalidObjectNameError
+)
+
 import os
 import mock
 import unittest
-from qingstor.sdk.client.upload_client import UploadClient
+
+
 from qingstor.sdk.config import Config
 from qingstor.sdk.service.qingstor import Bucket
 from qingstor.sdk.service.qingstor import QingStor
+from qingstor.sdk.client.upload_client import UploadClient
 
 TEST_PART_SIZE=5242880
 TEST_FILE_PATH='test_file_100M'
@@ -13,7 +19,8 @@ TEST_OBJECT_KEY='test_upload_20170804'
 TEST_ACCESS_KEY='This_is_mock_access_key'
 TEST_SECRET_ACCESS_KEY='This_is_mock_secret_access_key'
 
-class MockHttpResponse:
+
+class MockBucket:
 
     def __init__(self,status_code):
         self.status_code = status_code
@@ -23,32 +30,20 @@ class MockHttpResponse:
         return 000000000000
 
 
-class AccessConfig:
-
-    def __init__(self):
-        self.access_key=TEST_ACCESS_KEY
-        self.secret_access_key=TEST_SECRET_ACCESS_KEY
-
-    def set_qingstor(self):
-        self.config = Config(self.access_key, self.secret_access_key)
-        self.qingstor = QingStor(self.config)
-        return self.qingstor
-
-
 class TestUploadClient(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        output200=MockHttpResponse(200)
+        output200=MockBucket(200)
         cls.mock_http200=mock.Mock(return_value=output200)
-        output201=MockHttpResponse(201)
+        output201=MockBucket(201)
         cls.mock_http201=mock.Mock(return_value=output201)
-        output400=MockHttpResponse(400)
+        output400=MockBucket(400)
         cls.mock_http400=mock.Mock(return_value=output400)
 
-        # Set the access config
-        access_config=AccessConfig()
-        qingstor=access_config.set_qingstor()
+        config=Config(TEST_ACCESS_KEY,TEST_SECRET_ACCESS_KEY)
+        # QingStor.Bucket=mock_qingstor
+        qingstor=QingStor(config)
         # Create bucket instance
         bucket=qingstor.Bucket('test_upload_bucket','pek3a')
         cls.upload_obj = UploadClient(bucket, TEST_PART_SIZE)
