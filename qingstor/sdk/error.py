@@ -43,7 +43,7 @@ class ParameterValueNotAllowedError(Exception):
             ", ".join(self.allowed_values)])
 
 
-class PartTooSmallError:
+class PartTooSmallError(Exception):
 
     def __init__(self):
         pass
@@ -52,7 +52,7 @@ class PartTooSmallError:
         return repr("Entity_too_small: The part size is too small!")
 
 
-class MaxPartsExceededError:
+class MaxPartsExceededError(Exception):
 
     def __init__(self):
         pass
@@ -63,7 +63,7 @@ class MaxPartsExceededError:
             "The part's number exceeds part limitation(1000)"])
 
 
-class InvalidObjectNameError:
+class InvalidObjectNameError(Exception):
 
     def __init__(self):
         pass
@@ -72,7 +72,7 @@ class InvalidObjectNameError:
         return repr("Invalid Object Name!")
 
 
-class BadRequestError:
+class BadRequestError(Exception):
 
     def __init__(self):
         pass
