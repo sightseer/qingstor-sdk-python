@@ -1,17 +1,15 @@
-from qingstor.sdk.error import (
-    BadRequestError,
-    InvalidObjectNameError
-)
-
 import os
 import mock
 import unittest
-
 
 from qingstor.sdk.config import Config
 from qingstor.sdk.service.qingstor import Bucket
 from qingstor.sdk.service.qingstor import QingStor
 from qingstor.sdk.client.upload_client import UploadClient
+from qingstor.sdk.error import (
+    BadRequestError,
+    InvalidObjectNameError
+)
 
 TEST_PART_SIZE=5242880
 TEST_FILE_PATH='test_file_100M'
