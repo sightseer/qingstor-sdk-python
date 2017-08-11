@@ -1,7 +1,7 @@
 import os
 import logging
 
-from .read_file import ReadFile
+from .file_chunk import FileChunk
 from ..constant import (
     HTTP_OK,
     MAX_PARTS,
@@ -33,13 +33,14 @@ class UploadClient:
 
     """
 
-    def __init__(self, bucket, part_size=DEFAULT_PART_SIZE):
+    def __init__(self, bucket, callback, part_size=DEFAULT_PART_SIZE):
         if (part_size < SMALLEST_PART_SIZE):
             raise PartTooSmallError()
         else:
             self.bucket = bucket
             self.part_size = part_size
             self.logger = logging.getLogger("qingstor-sdk")
+            self._callback=callback
 
     def upload_file(self, object_key, fd, content_type=""):
         # Initiate multipart upload, create an upload id.
@@ -55,8 +56,8 @@ class UploadClient:
         this_upload_id = output['upload_id']
         part_index=0
         part_uploaded_list = []
-        read_file=ReadFile(fd,self.part_size)
-        for cur_read_part in read_file:
+        file_chunk=FileChunk(fd,self.part_size,self._callback)
+        for cur_read_part in file_chunk:
             output = self.bucket.upload_multipart(
                 object_key,
                 upload_id=this_upload_id,
@@ -67,6 +68,9 @@ class UploadClient:
                 part_index += 1
             else:
                 raise BadRequestError()
-        self.bucket.complete_multipart_upload(
+        output=self.bucket.complete_multipart_upload(
             object_key, this_upload_id, object_parts=part_uploaded_list)
-        self.logger.info("Multipart Upload Completed!")
+        if output.status_code==HTTP_CREATED:
+            self.logger.info("Multipart Upload Completed!")
+        else:
+            raise BadRequestError
