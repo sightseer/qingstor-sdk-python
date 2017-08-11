@@ -1,7 +1,7 @@
 import os
 import logging
 
-from .file_chunk import FileChunk
+from .read_file import ReadFile
 from ..constant import (
     HTTP_OK,
     MAX_PARTS,
@@ -42,14 +42,6 @@ class UploadClient:
             self.logger = logging.getLogger("qingstor-sdk")
 
     def upload_file(self, object_key, fd, content_type=""):
-        file_chunk = FileChunk(self.part_size, fd)
-        # Check the file size
-        if (file_chunk.file_size < SMALLEST_PART_SIZE):
-            self.bucket.put_object(object_key, body=fd)
-            return
-        # Check the part amount
-        if (file_chunk.part_amount > MAX_PARTS):
-            raise MaxPartsExceededError()
         # Initiate multipart upload, create an upload id.
         if content_type == "":
             output = self.bucket.initiate_multipart_upload(object_key)
@@ -61,10 +53,10 @@ class UploadClient:
             self.logger.error("Bad Request!")
             return
         this_upload_id = output['upload_id']
+        part_index=0
         part_uploaded_list = []
-        # This for loop is to upload each part iteratively until all parts uploaded.
-        for part_index in file_chunk.part_wait_list:
-            cur_read_part = file_chunk.read_file_part(part_index)
+        read_file=ReadFile(fd,self.part_size)
+        for cur_read_part in read_file:
             output = self.bucket.upload_multipart(
                 object_key,
                 upload_id=this_upload_id,
@@ -72,14 +64,9 @@ class UploadClient:
                 body=cur_read_part)
             if output.status_code == HTTP_CREATED:
                 part_uploaded_list += [{"part_number": part_index}]
+                part_index += 1
             else:
                 raise BadRequestError()
-        # Check if the number of uploaded part equals to the original part amount,
-        # if so, this uploading is completed.
-        if len(part_uploaded_list) == file_chunk.part_amount:
-            self.bucket.complete_multipart_upload(
-                object_key, this_upload_id, object_parts=part_uploaded_list)
-            self.logger.info("Multipart Upload Completed!")
-        else:
-            raise BadRequestError()
-        return
+        self.bucket.complete_multipart_upload(
+            object_key, this_upload_id, object_parts=part_uploaded_list)
+        self.logger.info("Multipart Upload Completed!")
