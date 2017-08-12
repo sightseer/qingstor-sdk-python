@@ -40,7 +40,7 @@ class UploadClient:
             self.bucket = bucket
             self.part_size = part_size
             self.logger = logging.getLogger("qingstor-sdk")
-            self._callback=callback
+            self.callback=callback
 
     def upload_file(self, object_key, fd, content_type=""):
         # Initiate multipart upload, create an upload id.
@@ -56,7 +56,7 @@ class UploadClient:
         this_upload_id = output['upload_id']
         part_index=0
         part_uploaded_list = []
-        file_chunk=FileChunk(fd,self.part_size,self._callback)
+        file_chunk=FileChunk(fd,self.part_size,self.callback)
         for cur_read_part in file_chunk:
             output = self.bucket.upload_multipart(
                 object_key,

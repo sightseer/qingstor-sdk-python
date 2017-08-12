@@ -32,3 +32,5 @@ SMALLEST_PART_SIZE = 4 * 1024 * 1024
 # The upper bound limitation of parts' number
 # Doc link: https://docs.qingcloud.com/qingstor/api/common/error_code.html
 MAX_PARTS = 1000
+
+SEGMENT_SIZE=1024
