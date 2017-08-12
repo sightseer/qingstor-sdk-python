@@ -16,7 +16,6 @@ class FileChunk(object):
         cur_part=b""
         for i in range(SEGMENT_SIZE,self.part_size,SEGMENT_SIZE):
             cur_segment=self.fd.read(SEGMENT_SIZE)
-            cur_segment=cur_segment.encode()
             if cur_segment==b"":
                 break
             cur_part+=cur_segment
