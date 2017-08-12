@@ -1,6 +1,6 @@
 import os
 
-from constant import SEGMENT_SIZE
+from ..constant import SEGMENT_SIZE
 
 class FileChunk(object):
 
