@@ -1,6 +1,6 @@
 import os
 
-from ..constant import SEGMENT_SIZE
+from constant import SEGMENT_SIZE
 
 class FileChunk(object):
 
@@ -24,3 +24,6 @@ class FileChunk(object):
             return cur_part
         else:
             raise StopIteration
+
+    def __next__(self):
+        self.next()
