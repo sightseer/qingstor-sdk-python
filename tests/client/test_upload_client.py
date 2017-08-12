@@ -1,3 +1,4 @@
+from qingstor.sdk.client.upload_client import UploadClient
 import os
 import mock
 import unittest
@@ -5,7 +6,7 @@ import unittest
 from qingstor.sdk.config import Config
 from qingstor.sdk.service.qingstor import Bucket
 from qingstor.sdk.service.qingstor import QingStor
-from qingstor.sdk.client.upload_client import UploadClient
+
 from qingstor.sdk.error import (
     BadRequestError,
     InvalidObjectNameError
@@ -69,14 +70,14 @@ class TestUploadClient(unittest.TestCase):
         Bucket.upload_multipart=self.mock_http201
         Bucket.complete_multipart_upload=self.mock_http201
         with open(TEST_FILE_PATH, 'rb') as f:
-            self.upload_obj.upload_file('upload_20180803.mp4', f)
+            self.upload_obj.upload('upload_20180803.mp4', f)
 
     def test_initialize_bad_response(self):
         # Mock the output of initiate_multipart_upload
         Bucket.initiate_multipart_upload=self.mock_http400
 
         with open(TEST_FILE_PATH, 'rb') as f:
-            self.assertRaises(InvalidObjectNameError,self.upload_obj.upload_file,TEST_OBJECT_KEY,f)
+            self.assertRaises(InvalidObjectNameError,self.upload_obj.upload,TEST_OBJECT_KEY,f)
 
     def test_upload_bad_response(self):
         # Mock the output of initiate_multipart_upload
@@ -86,7 +87,7 @@ class TestUploadClient(unittest.TestCase):
         Bucket.upload_multipart=self.mock_http400
 
         with open(TEST_FILE_PATH, 'rb') as f:
-            self.assertRaises(BadRequestError,self.upload_obj.upload_file,TEST_OBJECT_KEY,f)
+            self.assertRaises(BadRequestError,self.upload_obj.upload,TEST_OBJECT_KEY,f)
 
 
 if __name__=="__main__":
