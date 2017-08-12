@@ -10,6 +10,14 @@ TEST_PART_INDEX = 10
 EXPECTED_AMOUNT = 10240
 TEST_FILE_PATH="test_small_file"
 
+class CallbackFunc:
+
+    def __init__(self):
+        pass
+
+    def callback_func(self):
+        pass
+
 class TestFileChunk(unittest.TestCase):
     def setUp(self):
         os.system("dd if=/dev/zero of=test_small_file bs=1024 count=500")
@@ -17,20 +25,13 @@ class TestFileChunk(unittest.TestCase):
     def tearDown(self):
         os.system("rm -f test_small_file")
 
-    def test_read_file_part(self):
-        with open(TEST_FILE_PATH, "rb") as f:
-            f.seek(TEST_PART_SIZE*TEST_PART_INDEX, os.SEEK_SET)
-            expected_output=f.read(TEST_PART_SIZE)
-            f.seek(0, os.SEEK_SET)
-            temp_file_chunk = FileChunk(TEST_PART_SIZE, f)
-            test_output = temp_file_chunk.read_file_part(TEST_PART_INDEX)
-        self.assertEqual(expected_output,test_output)
+    def test_next(self):
+        callback_func=CallbackFunc()
+        with open(TEST_FILE_PATH, 'rb') as f:
+            test_file_chunk=FileChunk(f,TEST_PART_SIZE,callback_func.callback_func)
+            for cur_read_part in test_file_chunk:
+                continue
 
-    def test_get_part_amount(self):
-        with open(TEST_FILE_PATH, "rb") as f:
-            temp_file_chunk = FileChunk(TEST_PART_SIZE, f)
-            test_amount=temp_file_chunk.get_file_part_amount()
-        self.assertEqual(test_amount,EXPECTED_AMOUNT)
 
 if __name__=="__main__":
     unittest.main()
