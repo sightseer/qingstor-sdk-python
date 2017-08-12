@@ -1,6 +1,6 @@
 import os
 
-from ..constant import SEGMENT_SIZE
+from constant import SEGMENT_SIZE
 
 class FileChunk(object):
 
@@ -13,17 +13,16 @@ class FileChunk(object):
         return self
 
     def next(self):
-        cur_part=b""
+        cur_part=[]
         for i in range(SEGMENT_SIZE,self.part_size,SEGMENT_SIZE):
             cur_segment=self.fd.read(SEGMENT_SIZE)
             if cur_segment==b"":
                 break
-            cur_part+=cur_segment
+            cur_part.append(cur_segment)
             self.callback()
-        if cur_part:
-            return cur_part
-        else:
+        if cur_part==[]:
             raise StopIteration
+        return b"".join(cur_part)
 
     def __next__(self):
         self.next()
