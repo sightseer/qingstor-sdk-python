@@ -1,4 +1,3 @@
-from qingstor.sdk.client.upload_client import UploadClient
 import os
 import mock
 import unittest
@@ -6,7 +5,7 @@ import unittest
 from qingstor.sdk.config import Config
 from qingstor.sdk.service.qingstor import Bucket
 from qingstor.sdk.service.qingstor import QingStor
-
+from qingstor.sdk.client.upload_client import UploadClient
 from qingstor.sdk.error import (
     BadRequestError,
     InvalidObjectNameError
