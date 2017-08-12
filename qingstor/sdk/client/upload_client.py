@@ -1,8 +1,8 @@
 import os
 import logging
 
-from file_chunk import FileChunk
-from constant import (
+from .file_chunk import FileChunk
+from ..constant import (
     HTTP_OK,
     MAX_PARTS,
     HTTP_CREATED,
@@ -10,7 +10,7 @@ from constant import (
     DEFAULT_PART_SIZE,
     SMALLEST_PART_SIZE
 )
-from error import (
+from ..error import (
     BadRequestError,
     PartTooSmallError,
     MaxPartsExceededError,
